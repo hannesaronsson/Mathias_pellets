@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "small-python-projects"
+name = "Mathias pellets"
 version = "0.1.0"
 description = ""
-authors = ["Hannes Aronsson <hannes.aronsson@scania.com>"]
+authors = ["Hannes Aronsson"]
 readme = "README.md"
 
 [tool.poetry.dependencies]

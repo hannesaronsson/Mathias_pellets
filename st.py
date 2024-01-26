@@ -46,7 +46,6 @@ col_mapping = column_mapping = {
     "Establish try": "establish_try",
     "Extinguish try": "extinguish_try",
 }
-st.write(col_mapping)
 # df = pl.read_csv("test/log.csv", separator=";")[:, 1:].rename(col_mapping)
 uploaded_files = st.file_uploader(
     "Choose CSV files", accept_multiple_files=True, type="csv"
@@ -145,3 +144,5 @@ if uploaded_files:
     # df.columns = ['date','lang','temp_c','pwr','pellet_size','current_start_dose','']
 
     # st.dataframe(df)
+
+st.write(col_mapping)

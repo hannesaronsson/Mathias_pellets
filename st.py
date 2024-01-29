@@ -9,6 +9,7 @@ import pandas as pd
 st.set_page_config(layout="wide")
 col_mapping = column_mapping = {
     "": "time",
+    # "Column1": "time",
     "Språk": "language",
     "Temperature unit: 0 = Celcius, 1 = Fahrenheit": "temperature_unit",
     "Power: 0 = Low, 1 = High, 2 = Auto": "power_mode",
@@ -63,9 +64,14 @@ if uploaded_files:
 
         # df = pd.read_csv(uploaded_file, sep=";", index_col=None)
         # st.write(df)
+        # try:
         df = pl.read_csv(uploaded_file, separator=";", encoding="utf16")[:, 1:].rename(
             col_mapping
         )
+        # except:
+        #     df = pl.read_csv(uploaded_file, separator=";", encoding="utf8")[
+        #         :, 1:
+        #     ].rename(col_mapping)
 
         # Combine date and time into a single datetime column
         df = df.with_columns(
@@ -78,7 +84,7 @@ if uploaded_files:
 
         # Append to the combined DataFrame
         df_combined = df_combined.vstack(df) if df_combined.height > 0 else df
-        df = df_combined
+        df_combined = df_combined
 
     # Continue with your existing plotting code, but use df_combined instead of df
     # ...
@@ -88,10 +94,10 @@ if uploaded_files:
     # selected_column = st.selectbox("Select variable to plot", options=df.columns)
     selected_columns = st.multiselect(
         "Select variables to plot",
-        options=df.columns,
+        options=df_combined.columns,
     )
-    start_date = st.date_input("Start date", value=df["time"].min())
-    end_date = st.date_input("End date", value=df["time"].max())
+    start_date = st.date_input("Start date", value=df_combined["time"].min())
+    end_date = st.date_input("End date", value=df_combined["time"].max())
 
     # Ensure that start_date is not after end_date
     if start_date > end_date:
@@ -112,12 +118,6 @@ if uploaded_files:
 
     # Convert the 'time' column to datetime format using the correct format string
 
-    df_plot = df.filter(
-        (pl.col("time") >= start_datetime)
-        & (pl.col("time") <= end_datetime)
-        # & (pl.col(selected_column) != pl.col(selected_column).shift(-1))
-    )
-
     if len(selected_columns) == 0:
         st.warning("Select variable to plot")
     else:
@@ -132,7 +132,9 @@ if uploaded_files:
             )
 
             # Apply the mask to the DataFrame
-            df_plot = df.filter(change_mask)
+            df_plot = df_combined.filter(change_mask).filter(
+                (pl.col("time") < end_datetime) & (pl.col("time") > start_date)
+            )
 
             # Add a line plot to the current subplot
             fig.add_trace(

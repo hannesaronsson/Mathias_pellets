@@ -4,10 +4,11 @@ import plotly.express as px
 from datetime import datetime, time
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import pandas as pd
 
 st.set_page_config(layout="wide")
 col_mapping = column_mapping = {
-    "Column1": "time",
+    "": "time",
     "Språk": "language",
     "Temperature unit: 0 = Celcius, 1 = Fahrenheit": "temperature_unit",
     "Power: 0 = Low, 1 = High, 2 = Auto": "power_mode",
@@ -59,7 +60,12 @@ if uploaded_files:
     # Loop through each uploaded file
     for uploaded_file in uploaded_files:
         # Read the file into a DataFrame
-        df = pl.read_csv(uploaded_file, separator=";")[:, 1:].rename(col_mapping)
+
+        # df = pd.read_csv(uploaded_file, sep=";", index_col=None)
+        # st.write(df)
+        df = pl.read_csv(uploaded_file, separator=";", encoding="utf16")[:, 1:].rename(
+            col_mapping
+        )
 
         # Combine date and time into a single datetime column
         df = df.with_columns(
@@ -144,5 +150,5 @@ if uploaded_files:
     # df.columns = ['date','lang','temp_c','pwr','pellet_size','current_start_dose','']
 
     # st.dataframe(df)
-
-st.write(col_mapping)
+st.write("## Column mapping")
+st.json(col_mapping, expanded=False)
